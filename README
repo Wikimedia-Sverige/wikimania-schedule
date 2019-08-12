@@ -1,0 +1,17 @@
+Instructions for converting the Wikimania program into Pentabarf XML format.
+
+Run this command:
+
+python3 ./convert.py
+
+It should download the current schedule and the pages for all the talks, then
+generate the schedule in XML format and save it to schedule.xml
+
+Written by Edward Betts
+
+I, the copyright holder of this work, release this work into the public domain.
+This applies worldwide.
+
+edward@4angle.com
+telegram: @EdwardBetts
+twitter: @EdwardBetts
