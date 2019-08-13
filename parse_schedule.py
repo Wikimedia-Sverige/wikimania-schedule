@@ -345,7 +345,7 @@ def main():
                 'track': 'Spotlight session',
             }
 
-            build_event(room, item, title, 90004, [])
+            build_event(room, item, title, 90005, [])
 
             item = {
                 'abstract': spotlight_abstract,
@@ -356,7 +356,7 @@ def main():
                 'track': 'Spotlight session',
             }
 
-            build_event(room, item, title, 90005, [])
+            build_event(room, item, title, 90006, [])
 
         for table in tables:
             xrooms, xitems = table_to_items(table)
