@@ -11,8 +11,8 @@ re_room_name = re.compile(r'^(.+)<br>(?:<[^>]*>)*\'+([A-Z]\d+)\'+')
 re_colspan = re.compile(r'^\s*colspan="(\d)"\s*\|\s*')
 re_col = re.compile(r'(?:!!|\|\|)')
 re_day = re.compile(r'^[A-Z][a-z]+ (\d+) August')
-
 re_attribs = re.compile(r' *([a-z]+)="([^"]*)"')
+re_time_item = re.compile(r'\d\d:\d\d$')
 
 def tidy_room_name(room):
     if room.startswith("'''") and room.endswith("'''"):
@@ -183,12 +183,20 @@ def table_to_items(table):
             print(cls)
 
     items = []
+    last_time = None
     for row in range(2, len(grid)):
         cls = row_class[row]
         if cls != 'items':
             continue
 
         row_time = cell_text(grid[row][0])
+        time_rows = grid[row][0]['rowspan']
+        if last_time and time_rows > 1:
+            for item in items:
+                if item['start'] == last_time:
+                    item['duration'] = \
+                        rowspan_to_duration(item['rows'] - (time_rows - 1))
+                    print(item['duration'])
         assert len(row_time) == 5
 
         for col in range(1, len(grid[row])):
@@ -206,6 +214,8 @@ def table_to_items(table):
             if row != cell['row']:
                 assert cell_text(grid[cell['row']][col]) == text
             item['start'] = row_time
+            last_time = row_time
+            item['rows'] = cell['rowspan']
             item['duration'] = rowspan_to_duration(cell['rowspan'])
             item['room'] = rooms[col]
             items.append(item)
@@ -288,6 +298,7 @@ def main():
     page_ids['2019:Diversity/Lightning talks#Sunday'] = 90001
     page_ids['2019:Libraries/Ideation sessions#Part 2'] = 90002
     page_ids['2019:Libraries/Ideation sessions#Part 3'] = 90003
+    page_ids['2019:Hackathon/program#Sunday, August 18: WIKIMANIA HACKATHON CLOSING / SHOWCASE'] = 90004
 
     meta = [
         ('title', 'Wikimania 2019'),
