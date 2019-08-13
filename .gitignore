@@ -1,0 +1,8 @@
+__pycache__
+extracts
+pages
+
+*.mediawiki
+*~
+
+schedule.xml
