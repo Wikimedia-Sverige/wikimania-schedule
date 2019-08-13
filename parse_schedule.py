@@ -196,7 +196,6 @@ def table_to_items(table):
                 if item['start'] == last_time:
                     item['duration'] = \
                         rowspan_to_duration(item['rows'] - (time_rows - 1))
-                    print(item['duration'])
         assert len(row_time) == 5
 
         for col in range(1, len(grid[row])):
@@ -218,6 +217,10 @@ def table_to_items(table):
             item['rows'] = cell['rowspan']
             item['duration'] = rowspan_to_duration(cell['rowspan'])
             item['room'] = rooms[col]
+            item['identifiers'] = []
+            for k, v in item.items():
+                if v == 'yes':
+                    item['identifiers'].append(k)
             items.append(item)
 
     return rooms, items
@@ -269,7 +272,10 @@ def build_event(room, item, title, event_id, presenters):
 
     links = etree.SubElement(event, 'links')
     etree.SubElement(links, 'link', href=url).text = 'detail'
-
+    identifiers = etree.SubElement(event, 'identifiers')
+    if 'identifiers' in item:
+        for identifier in item['identifiers']:
+            identifiers.set(identifier, 'true')
 
 spotlight_abstract = '''How does Free Knowledge relate to Sustainable Development? Can the Wikimedia movement contribute to a better world? What role can free knowledge play in the work to fulfill Agenda 2030 – the world's shared vision for a sustainable future?
 
