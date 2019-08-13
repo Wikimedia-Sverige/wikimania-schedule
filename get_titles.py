@@ -13,8 +13,24 @@ start2 = start + 'title='
 page_size = 50
 
 def main():
-    get_pages()
-    extracts()
+    filename = max(f for f in os.listdir('.') if f[0].isdigit())
+    titles = [
+        '2019:Program/Free Knowledge and the Global Goals Spotlight Session'
+    ]
+    for line in open(filename):
+        if start not in line or '}}' not in line:
+            continue
+        item = line[line.find(start):line.rfind('}}') + 2]
+        if not item.startswith(start2):
+            print(line)
+        assert item.startswith(start2)
+        title = item[len(start2):item.find('|', len(start2))].strip()
+        if not title or title == 'Test':
+            continue
+        title = tidy_title(title)
+        titles.append(title)
+    get_pages(titles)
+    extracts(titles)
 
 def tidy_title(title):
     return urllib.parse.unquote(title.replace('_', ' '))
@@ -61,23 +77,7 @@ def get_page_iter(titles):
         for page in pages:
             yield page
 
-
-filename = max(f for f in os.listdir('.') if f[0].isdigit())
-titles = ['2019:Program/Free Knowledge and the Global Goals Spotlight Session']
-for line in open(filename):
-    if start not in line or '}}' not in line:
-        continue
-    item = line[line.find(start):line.rfind('}}') + 2]
-    if not item.startswith(start2):
-        print(line)
-    assert item.startswith(start2)
-    title = item[len(start2):item.find('|', len(start2))].strip()
-    if not title or title == 'Test':
-        continue
-    title = tidy_title(title)
-    titles.append(title)
-
-def get_pages():
+def get_pages(titles):
     for page in get_page_iter(titles):
         if 'missing' in page:
             continue
@@ -88,7 +88,7 @@ def get_pages():
         json.dump(page, out)
         out.close()
 
-def extracts():
+def extracts(titles):
     for page in get_extracts(titles):
         print(page)
         if 'missing' in page:

@@ -5,8 +5,6 @@ import json
 from lxml import etree
 from defaultlist import defaultlist
 
-filename = max(f for f in os.listdir('.') if f[0].isdigit())
-
 re_heading = re.compile(r'==\s*(.*August)\s*==')
 re_row_class = re.compile(r'^\|- class="([^"]+)"')
 re_room_name = re.compile(r'^(.+)<br>(?:<[^>]*>)*\'+([A-Z]\d+)\'+')
@@ -53,6 +51,7 @@ def iter_schedule():
     in_table = False
     day = None
     tables = []
+    filename = max(f for f in os.listdir('.') if f[0].isdigit())
     for line in open(filename):
         m = re_heading.match(line.strip())
         if m:
