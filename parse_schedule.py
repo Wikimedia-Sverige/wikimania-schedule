@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import re
 import os
 import urllib.parse
@@ -387,12 +385,8 @@ def main():
                             xml_declaration=True,
                             encoding='utf-8',
                             pretty_print=True)
-    print(as_xml.decode('utf-8'), end='')
-    return
+    return as_xml.decode('utf-8')
 
 def test_rowspan_to_duration():
     for rowspan in range(1, 10):
         print(rowspan, rowspan_to_duration(rowspan))
-
-
-main()

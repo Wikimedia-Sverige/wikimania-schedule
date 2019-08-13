@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import requests
 from datetime import datetime
 from pprint import pprint
@@ -6,6 +5,16 @@ from pprint import pprint
 user_agent = 'Program converter/0.1'
 query_url = 'https://wikimania.wikimedia.org/w/api.php'
 
+
+def main():
+    params = {'prop': 'revisions', 'rvprop': 'ids|content'}
+    page = run_query('2019:Program', params)[0]['revisions'][0]['content']
+
+    now = datetime.now().strftime('%Y%m%d%H%M') + '.mediawiki'
+    out = open(now, 'w')
+    out.write(page)
+    out.close()
+    # pprint(page, stream=open(now, 'w'))
 
 def run_query(title, params):
     base = {
@@ -23,13 +32,3 @@ def run_query(title, params):
     if 'query' not in json_reply:
         pprint(json_reply)
     return json_reply['query']['pages']
-
-
-params = {'prop': 'revisions', 'rvprop': 'ids|content'}
-page = run_query('2019:Program', params)[0]['revisions'][0]['content']
-
-now = datetime.now().strftime('%Y%m%d%H%M') + '.mediawiki'
-out = open(now, 'w')
-out.write(page)
-out.close()
-# pprint(page, stream=open(now, 'w'))

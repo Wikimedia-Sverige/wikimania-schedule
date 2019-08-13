@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import urllib.parse
 import requests
 import json
@@ -12,6 +11,10 @@ query_url = 'https://wikimania.wikimedia.org/w/api.php'
 start = '{{Program item|'
 start2 = start + 'title='
 page_size = 50
+
+def main():
+    get_pages()
+    extracts()
 
 def tidy_title(title):
     return urllib.parse.unquote(title.replace('_', ' '))
@@ -94,7 +97,3 @@ def extracts():
         out = open(f'extracts/{pageid:05d}.json', 'w')
         json.dump(page, out)
         out.close()
-
-
-get_pages()
-extracts()
