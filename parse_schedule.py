@@ -12,7 +12,7 @@ re_colspan = re.compile(r'^\s*colspan="(\d)"\s*\|\s*')
 re_col = re.compile(r'(?:!!|\|\|)')
 re_day = re.compile(r'^[A-Z][a-z]+ (\d+) August')
 re_attribs = re.compile(r' *([a-z]+)="([^"]*)"')
-re_time_item = re.compile(r'\d\d:\d\d$')
+re_link = re.compile(r' *\[\[[^|]*\|(.*)\]\]')
 
 def tidy_room_name(room):
     if room.startswith("'''") and room.endswith("'''"):
@@ -184,8 +184,19 @@ def table_to_items(table):
 
     items = []
     last_time = None
+    spaces = {}
     for row in range(2, len(grid)):
         cls = row_class[row]
+        if cls == 'space':
+            for column in range(len(grid[row])):
+                if column > 0 and column < len(grid[row]):
+                    # First and last cell says "Space".
+                    cell = grid[row][column]
+                    if cell['rowspan'] == 1:
+                        match = re_link.match(cell['text'])
+                        if match:
+                            space = match[1].lower()
+                            spaces[column] = space
         if cls != 'items':
             continue
 
@@ -221,6 +232,7 @@ def table_to_items(table):
             for k, v in item.items():
                 if v == 'yes':
                     item['identifiers'].append(k)
+            item['space'] = spaces[col]
             items.append(item)
 
     return rooms, items
@@ -253,6 +265,8 @@ def build_event(room, item, title, event_id, presenters):
         ('abstract', item['abstract']),
         ('description', ''),
     ]
+    if 'space' in item:
+        event_data.append(('space', item['space']))
 
     # event_id = page_ids.get(title)
     event = etree.SubElement(room, 'event', id=str(event_id))
@@ -275,7 +289,7 @@ def build_event(room, item, title, event_id, presenters):
     identifiers = etree.SubElement(event, 'identifiers')
     if 'identifiers' in item:
         for identifier in item['identifiers']:
-            identifiers.set(identifier, 'true')
+            identifiers.set(identifier, 'yes')
 
 spotlight_abstract = '''How does Free Knowledge relate to Sustainable Development? Can the Wikimedia movement contribute to a better world? What role can free knowledge play in the work to fulfill Agenda 2030 – the world's shared vision for a sustainable future?
 
@@ -290,8 +304,6 @@ def main():
     for f in os.scandir('pages'):
         page = json.load(open(f.path))
         title = page['title']
-        if title in page_ids:
-            print(title, page['pageid'], page_ids[title])
         assert title not in page_ids
         page_ids[title] = page['pageid']
         # print(page['pageid'], title)
@@ -372,6 +384,7 @@ def main():
                 rooms = xrooms
             items += xitems
 
+        added_items = []
         for room_name in rooms:
             if not room_name:
                 continue
@@ -381,6 +394,10 @@ def main():
                 continue
             room = etree.SubElement(day, 'room', name=room_name)
             for item in room_items:
+                if item in added_items:
+                    # HACK: Don't add multiple events for rooms that
+                    # span several columns.
+                    continue
                 title = urllib.parse.unquote(item['title'].replace('_', ' ')).strip()
                 item['abstract'] = abstracts.get(title, '')
                 event_id = page_ids[title]
@@ -396,6 +413,7 @@ def main():
                     presenters.append((person_id, name))
 
                 build_event(room, item, title, event_id, presenters)
+                added_items.append(item)
 
     as_xml = etree.tostring(root,
                             xml_declaration=True,

@@ -90,7 +90,6 @@ def get_pages(titles):
 
 def extracts(titles):
     for page in get_extracts(titles):
-        print(page)
         if 'missing' in page:
             continue
         pageid = page['pageid']
