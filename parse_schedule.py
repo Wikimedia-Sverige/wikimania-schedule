@@ -20,7 +20,7 @@ def tidy_room_name(room):
     if '<br>' not in room:
         return room
     m = re_room_name.match(room)
-    return f'{m.group(1)} ({m.group(2)})'
+    return '{} ({})'.format(m.group(1), m.group(2))
 
 def get_abstract(content):
     if '=== Description ===' not in content:
@@ -156,7 +156,7 @@ def parse_program_item(text):
 
 def rowspan_to_duration(rowspan):
     mins = rowspan * 15
-    return f'{mins // 60:02d}:{mins % 60:02d}'
+    return '{:02d}:{:02d}'.format(mins // 60, mins % 60)
 
 def is_program_item(text):
     return text.startswith('{{Program item|') and text.endswith('}}')
@@ -195,7 +195,7 @@ def table_to_items(table):
                     if cell['rowspan'] == 1:
                         match = re_link.match(cell['text'])
                         if match:
-                            space = match[1].lower()
+                            space = match.group(1).lower()
                             spaces[column] = space
         if cls != 'items':
             continue
@@ -340,7 +340,7 @@ def main():
     for day_heading, tables in iter_schedule():
         index += 1
         m = re_day.match(day_heading)
-        d = f'2019-08-{m.group(1)}'
+        d = '2019-08-{}'.format(m.group(1))
 
         day = etree.SubElement(root, 'day')
         day.set('index', str(index))

@@ -84,7 +84,7 @@ def get_pages(titles):
         if 'pageid' not in page:
             print(json.dumps(page, indent=2))
         pageid = page['pageid']
-        out = open(f'pages/{pageid:05d}.json', 'w')
+        out = open('pages/{:05d}.json'.format(pageid), 'w')
         json.dump(page, out)
         out.close()
 
@@ -93,6 +93,6 @@ def extracts(titles):
         if 'missing' in page:
             continue
         pageid = page['pageid']
-        out = open(f'extracts/{pageid:05d}.json', 'w')
+        out = open('extracts/{:05d}.json'.format(pageid), 'w')
         json.dump(page, out)
         out.close()
