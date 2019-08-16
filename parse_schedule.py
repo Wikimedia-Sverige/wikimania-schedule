@@ -218,8 +218,6 @@ def table_to_items(table):
                 continue
             seen.add(text)
             item = parse_program_item(text)
-            if '/' not in item['title']:
-                continue
             assert item['title'].startswith('2019:')
             if row != cell['row']:
                 assert cell_text(grid[cell['row']][col]) == text
